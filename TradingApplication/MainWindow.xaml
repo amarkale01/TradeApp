@@ -1,0 +1,163 @@
+﻿<Window x:Class="TradingApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TradingApplication"
+        mc:Ignorable="d"
+        Title="Trading App" Height="600" Width="1000" Closed="Window_Closed" WindowState="Normal"  Foreground="#FFC26C6C">
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="Black"/>
+            <GradientStop Color="White" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black"/>
+                <GradientStop Color="#FFBC3737" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="1" Grid.Column="6" FontSize="30" Margin="0,0,0,10" Text="TradeBOT Application..." Foreground="White"/>
+        <TextBlock Grid.Row="1" Grid.Column="6" FontSize="30" Margin="0,0,0,10" Text="" Foreground="White"/>
+        <!--<Image Grid.Row="1" Grid.Column="1"  Margin="0,0,0,10" Grid.ColumnSpan="6" Source="/header.jpg" Stretch="UniformToFill" Height="80" ></Image>-->
+
+        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Width="150" Text="Token generated"/>
+        <CheckBox Grid.Row="1" Grid.Column="1" Margin="100,15,10,10" IsChecked="True" Name="chkTokenGenerated"/>
+        <Button Grid.Row="1" Grid.Column="2" Width="100" Content="Generate" HorizontalAlignment="Left"  Name="btnToken" Click="btnToken_Click" Height="26" />
+
+
+        <TextBlock Grid.Row="2" Grid.Column="1"  Margin="0,0,0,10"  Text="Strike"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" Margin="50,0,0,10" Name="cmbSymbol" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="25">
+            <ComboBoxItem Content="BANKNIFTY" ></ComboBoxItem>
+            <ComboBoxItem Content="NIFTY" IsSelected="True"></ComboBoxItem>
+        </ComboBox>
+        <TextBox  Grid.Row="2" Grid.Column="2" Name ="txtStrike" Width="100" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+
+        <!--<TextBlock Grid.Row="3" Grid.Column="1" Margin="0,0,0,10" Text="Call" />-->
+        <CheckBox Grid.Row="2" Grid.Column="5" IsChecked="True" Margin="10,0,0,0" Foreground="#FFC26C6C" Name="chkCallChecked">CE</CheckBox>
+        <CheckBox Grid.Row="2" Grid.Column="5" IsChecked="True" Margin="60,0,0,0" Foreground="#FFC26C6C" Name="chkPutChecked">PE</CheckBox>
+
+
+
+        <TextBlock Grid.Row="3" Grid.Column="1"  Margin="0,0,0,10"  Text="Strangle Diff"/>
+        <CheckBox Grid.Row="3" Grid.Column="1" Margin="100,0,0,10" IsChecked="False" Name="chkStrangleChecked" Click="chkStrangleChecked_Checked"/>
+        <TextBox  Grid.Row="3" Grid.Column="2" Name ="txtOTMDiff" Width="100" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+
+        <TextBlock  Grid.Row="3" Grid.Column="5" Margin="0,0,0,10" ><Run Text="Expiry Week : "/></TextBlock>
+        <TextBlock  Grid.Row="3" Grid.Column="6" Margin="0,0,0,10" Foreground="White" x:Name="tblExpiryWeek"></TextBlock>
+
+
+
+        <!--<TextBlock Grid.Row="4" Grid.Column="1" Margin="0,0,0,10"  Text="Put"/>
+        <CheckBox Grid.Row="4" Grid.Column="2" Margin="0,0,0,10" IsChecked="True" Name="chkPutChecked"/>-->
+
+        <TextBlock Grid.Row="4" Grid.Column="1" Margin="0,0,0,10"  Text="Lots"/>
+        <TextBox  Grid.Row="4" Grid.Column="2" Name ="txtLots" Width="100" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+
+        <!--<TextBlock  Grid.Row="4" Grid.Column="5" Margin="0,0,0,10" ><Run Text="SL in % : "/></TextBlock>-->
+        <ComboBox Grid.Row="4" Grid.Column="5" Margin="0,0,0,10" Name="cmbSL" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="25">
+            <ComboBoxItem Content="SL in %" ></ComboBoxItem>
+            <ComboBoxItem Content="SL in Pt" IsSelected="True"></ComboBoxItem>
+        </ComboBox>
+        <!--<TextBlock  Grid.Row="4" Grid.Column="6" Margin="0,0,0,10" Foreground="White" x:Name="tblSL" ></TextBlock>-->
+        <TextBox  Grid.Row="4" Grid.Column="6" Name ="txtSL" Width="80" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="6"  Margin="90,0,0,0" VerticalAlignment="Top"  Text="Bank Nifty : "/>
+        <TextBlock Grid.Row="3" Grid.Column="6"  Margin="160,-10,0,0" VerticalAlignment="Top"  FontSize="25" Foreground="White" Name="lblBanknifty"  Text="Bank Nifty" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+        <Button Grid.Row="3" Grid.Column="7" Width="70" Margin="-5,-10,0,0" HorizontalAlignment="Left" Content="Start Ticker"  Name="btnTickerConnect"  Click="btnTickerConnect_Click" Height="26" />
+        <!--<Button Grid.Row="4" Grid.Column="7" Width="110" Margin="75,0,0,0" HorizontalAlignment="Left" Content="Start BN Strategy"  Name="btnBankNiftyStrategy"  Click="btnBankNiftyStrategy_Click" Height="26" />-->
+        <TabControl Grid.Row="3" Grid.Column="6" Grid.RowSpan="6" Grid.ColumnSpan="2" Margin="125,27,10,1">
+            <TabItem Header="BankNifty">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="87*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyCE" Margin="0,15,0,107" Grid.ColumnSpan="2" Width="175">BankNifty 35500 CE</TextBlock>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyPE" Margin="1,31,0,91" RenderTransformOrigin="-0.111,0.312" Grid.ColumnSpan="2" Width="187">BankNifty 35500 PE</TextBlock>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyCEValue" Margin="78,15,0,107" Grid.Column="1" RenderTransformOrigin="2.021,0.5">CE Value</TextBlock>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyPEValue" Margin="78,33,0,89" RenderTransformOrigin="-0.111,0.312" Grid.Column="1">PE Value</TextBlock>
+                    <TextBox  Grid.Row="1" Grid.Column="1" Name ="txtBankNiftySL" Width="80" Margin="0,0,0,10" Height="20" HorizontalAlignment="Left"/>
+                    <TextBlock Grid.Row="1" VerticalAlignment="Center"  Text="Stop Loss : "/>
+                    <Button Grid.Row="1" Grid.Column="1" Width="110"  HorizontalAlignment="Left" Content="Start BN Strategy"  Name="btnBankNiftyStrategy"  Click="btnBankNiftyStrategy_Click" Height="26" Margin="187,51,0,61"  />
+                    <TextBlock Grid.Row="1" VerticalAlignment="Center"  Text="Bank Nifty Strategy MTM : " Grid.ColumnSpan="2" Margin="0,82,304,40"/>
+                    <TextBlock Grid.Row="1" Width="68" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyStrategyMTM" Margin="58,82,0,40" RenderTransformOrigin="1.221,1.44" Grid.Column="1">MTM value</TextBlock>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Telegram Strategy">
+                <Grid Height="111" Width="300">
+                    <TextBlock  Grid.Row="1" Grid.Column="1" ><Run Text="Telegram Code : "/></TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="1" Name ="txtTelegramCode" Width="80" Margin="110,0,110,86"  />
+                    <Button Grid.Row="2" Grid.Column="1" Width="100"   Content="Start Strategy"  Name="btnStrategy"  Click="btnStrategy_Click" Height="26"   />
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <!--<Button Grid.Row="5" Grid.Column="1" Width="60" Content="Entry" HorizontalAlignment="Left" Name="btnEntry" Margin="0,0,0,10" Click="btnEntry_Click"/>
+        <Button Grid.Row="5" Grid.Column="2" Width="60" Content="Exit" Margin="0,0,0,10" HorizontalAlignment="Left" Name="btnExit" Click="btnExit_Click"></Button>-->
+        <TextBlock Grid.Row="5" Grid.Column="1" Margin="0,0,0,10"  Text="Order Type"/>
+
+        <ComboBox Grid.Row="5" Grid.Column="2" Margin="0,0,0,10" Name="cmbOrderType" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="25">
+            <ComboBoxItem Content="BUY" IsSelected="True"></ComboBoxItem>
+            <ComboBoxItem Content="SELL" ></ComboBoxItem>
+        </ComboBox>
+
+        <TextBlock  Grid.Row="5" Grid.Column="5" Margin="0,0,0,10" ><Run Text="Max Profit : "/></TextBlock>
+        <TextBox  Grid.Row="5" Grid.Column="6" Name ="txtMaxProfit" Width="80" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+        <!--<TextBlock Grid.Row="5" Grid.Column="6"  Margin="90,0,0,0" VerticalAlignment="Center"  Text="Bank Nifty Strategy MTM : "/>
+        <TextBlock  Grid.Row="5" Grid.Column="6" Width="60" Margin="230,0,0,0" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyStrategyMTM">MTM value</TextBlock>-->
+        <Button Grid.Row="6" Grid.Column="1" Width="100" Height="25" Content="Entry" HorizontalAlignment="Left" Name="btnEntry" Margin="0,0,0,10" Click="btnEntry_Click"/>
+        <Button Grid.Row="6" Grid.Column="2" Width="100" Content="Exit Nifty" Margin="0,0,0,10" HorizontalAlignment="Left" Name="btnExit" Click="btnExit_Click"></Button>
+
+        <TextBlock  Grid.Row="6" Grid.Column="5" Margin="0,0,0,10" ><Run Text="Max Loss : "/></TextBlock>
+        <TextBox  Grid.Row="6" Grid.Column="6" Name ="txtMaxLoss" Width="80" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+        <!--<TextBlock  Grid.Row="6" Grid.Column="6" Margin="90,0,0,10" ><Run Text="Telegram Code : "/></TextBlock>
+        <TextBox  Grid.Row="6" Grid.Column="6" Name ="txtTelegramCode" Width="80" Margin="183,0,0,10" HorizontalAlignment="Left"/>
+        <Button Grid.Row="6" Grid.Column="7" Width="100" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Start Strategy"  Name="btnStrategy"  Click="btnStrategy_Click" Height="26" />-->
+
+        <Button Grid.Row="7" Grid.Column="2" Width="100" Height="25" Content="Exit BankNifty" Margin="00,0,0,10" HorizontalAlignment="Left" Name="btnExitBankNifty" Click="btnExitBankNifty_Click"></Button>
+        <Button Grid.Row="7" Grid.Column="6" Width="80" Content="Update" HorizontalAlignment="Left" Name="btnUpdate"  Click="btnUpdate_Click" Height="26" />
+
+
+        <TextBlock  Grid.Row="8" Grid.Column="2" Width="120" Margin="0,0,0,0" HorizontalAlignment="Left" Foreground="White" FontWeight="Bold" Name="tblMTM">MTM value</TextBlock>
+        <Button Grid.Row="8" Grid.Column="5" Width="90" Margin="-30,0,0,0" Content="Start MTM Exit" Name="btnMTMExit" Click="btnMTMExit_Click" Height="25" VerticalAlignment="Center" ></Button>
+
+        <Button Grid.Row="8" Grid.Column="6"  Width="120" Margin="0,0,0,0" HorizontalAlignment="Left" Content="Get Master Contract"  Name="btnMasterContract"  Click="btnMasterContract_Click" Height="26" />
+
+        <TextBox Grid.Row="9" Name ="txtLogs" Grid.ColumnSpan="8"   Margin="10,10,10,10"  
+                 VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" IsEnabled="True" KeyDown="txtLogs_KeyDown"/>
+
+
+
+
+    </Grid>
+</Window>

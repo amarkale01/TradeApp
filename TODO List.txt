@@ -1,0 +1,6 @@
+
+1. System resume in case of power cut.
+2. Universal exit condition in case of max proft / loss
+3. Logs in database
+4. SL and take profit configuration as per strategy
+5. Log separation like verbose,info,error
