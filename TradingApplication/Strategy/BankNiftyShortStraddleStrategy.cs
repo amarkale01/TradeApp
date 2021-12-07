@@ -30,10 +30,12 @@ namespace TradingApplication.Strategy
 
         private bool IsStraddleUnderMonitoring = false;
         private bool IsStopLossHit = false;
+        private bool IsWaitingFor20Points = false;
 
-        private bool IsMTMExitEnabled = false;
-        
+        public bool IsMTMExitEnabled = false;
 
+        private decimal OptionWaitForPrice = 0;
+        private decimal OptionLastStopLossPrice = 0;
         public string CurrentBankNifty = string.Empty;
         public DayPosition CurrentStrategyPosition = null;
         public double DayM2m = 0;
@@ -126,13 +128,15 @@ namespace TradingApplication.Strategy
             try
             {
                 string currentTime = DateTime.Now.ToString("hh:mm");
+                int currentBankNifty = 0;
 
-                if (Is945StraddleEnabled && !Is945StraddleExecuted && !string.IsNullOrEmpty(TradeAutoExecutionTime))//&& string.Compare(currentTime, TradeAutoExecutionTime, true) == 0
+                if(!string.IsNullOrEmpty(CurrentBankNifty))
+                    currentBankNifty = Convert.ToInt32(CurrentBankNifty);
+
+                if (Is945StraddleEnabled && !Is945StraddleExecuted && !string.IsNullOrEmpty(TradeAutoExecutionTime))// && string.Compare(currentTime, TradeAutoExecutionTime, true) == 0
                 {
-                    int currentBankNifty = Convert.ToInt32(CurrentBankNifty);
-
                     if (IsStraddleUnderMonitoring)
-                        ExecuteStraddle(currentBankNifty);
+                        ExecuteStraddle();
                     else if (currentBankNifty > 0 && !IsStraddleUnderMonitoring)
                         StartStraddleMonitoring(currentBankNifty);
                 }
@@ -229,7 +233,7 @@ namespace TradingApplication.Strategy
             }
         }
 
-        private async void ExecuteStraddle(int strike)
+        private async void ExecuteStraddle()
         {
             try
             {
@@ -249,7 +253,7 @@ namespace TradingApplication.Strategy
                             if (tick.StopLoss == 0)
                             {
                                 tick.InitialPrice = tick.LastPrice;
-                                tick.StopLoss = Convert.ToDecimal((double)tick.LastPrice * 1.25);
+                                tick.StopLoss = Convert.ToDecimal((double)tick.LastPrice * 1.20);
                                 LogMessage?.Invoke("Monitoring " + tick.Symbol);
                                 LogMessage?.Invoke("InitialPrice Price " + tick.InitialPrice);
                                 LogMessage?.Invoke("StopLoss Price " + tick.StopLoss);
@@ -271,10 +275,42 @@ namespace TradingApplication.Strategy
                         if (removeTick != null)
                         {
                             straddleTicks.Remove(removeTick);
+                            IsWaitingFor20Points = true;
+
+                            if(straddleTicks != null && straddleTicks.Count > 0)
+                            {
+                                straddleTicks[0].InitialPrice = straddleTicks[0].LastPrice;
+                                OptionWaitForPrice = straddleTicks[0].LastPrice;
+                                OptionWaitForPrice += 10;
+                                OptionLastStopLossPrice = straddleTicks[0].StopLoss;
+                                LogMessage?.Invoke("Wait for  " + straddleTicks[0].Symbol + " to hit " + OptionWaitForPrice);
+                            }
+                            
                             LogMessage?.Invoke("Stop Loss hit for " + removeTick.Symbol);
-                            ExecuteSELLForStraddle(strike);
+                            //ExecuteBUYForStraddle(strike);//
+                            //ExecuteSELLForStraddle(strike);
                             OnStraddleTickStopLossHit?.Invoke(removeTick);
                         }
+                    }
+                }
+                else if(IsWaitingFor20Points)
+                {
+                    uint code = 0;
+                    int iStrike = 0;
+                    foreach (Tick tick in straddleTicks)
+                    {
+                        if (tick.LastPrice > OptionWaitForPrice)
+                        {
+                            code = tick.InstrumentToken;
+                            iStrike = tick.Strike;
+                            break;
+                        }
+                    }
+
+                    if (code != 0)
+                    {
+                        IsWaitingFor20Points = false;
+                        ExecuteSELLForStraddle(iStrike);
                     }
                 }
 
@@ -307,6 +343,11 @@ namespace TradingApplication.Strategy
                 straddleTicks.Add(apiProcessor.GetInstrumentTick($"BANKNIFTY {ExpiryWeek} {ceStrike}.0 CE"));
                 straddleTicks.Add(apiProcessor.GetInstrumentTick($"BANKNIFTY {ExpiryWeek} {peStrike}.0 PE"));
 
+                foreach(Tick tick in straddleTicks)
+                {
+                    tick.Strike = iStrike;
+                }
+
                 LogMessage?.Invoke($"Monitoring {TradeAutoExecutionTime} Short Straddle for strike " + iStrike);
 
                 OnStraddleTickMonitoringStart?.Invoke(straddleTicks);
@@ -333,7 +374,7 @@ namespace TradingApplication.Strategy
                 {
                     straddleTicks.Clear();
                     int currentBankNifty = Convert.ToInt32(CurrentBankNifty);
-                    Is945StraddleExecuted = true;
+                    
 
                     if (straddleTicks == null)
                         straddleTicks = new List<Tick>();
@@ -349,6 +390,20 @@ namespace TradingApplication.Strategy
                         OnStraddleTickMonitoringStart?.Invoke(straddleTicks);
 
                     LogMessage?.Invoke("Executed BANKNIFTY SELL strike " + iStrike);
+                    
+
+                    apiProcessor.IsStrangleChecked = true;
+                    apiProcessor.Strike = Round(strike);
+                    apiProcessor.OTMDiff = 400;
+                    apiProcessor.StopLossForOrder = "60";
+                    apiProcessor.IsStopLossInPercent = false;
+                    apiProcessor.TransactionOrderType = "BUY";
+                    apiProcessor.IsCEChecked = true;
+                    apiProcessor.IsPEChecked = true;
+
+                    await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+                    System.Threading.Thread.Sleep(10000);
+
                     if (!string.IsNullOrEmpty(tick.Symbol) && tick.Symbol.ToLower().IndexOf("ce") > 0)
                     {
                         apiProcessor.IsCEChecked = true;
@@ -358,6 +413,69 @@ namespace TradingApplication.Strategy
                     {
                         apiProcessor.IsCEChecked = false;
                         apiProcessor.IsPEChecked = true;
+                    }
+
+                    apiProcessor.IsStrangleChecked = false;
+                    apiProcessor.OTMDiff = 0;
+                    apiProcessor.Strike = Round(strike);
+                    apiProcessor.IsStopLossInPercent = false;
+                    apiProcessor.TransactionOrderType = "SELL";
+
+                    await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+
+                    Is945StraddleExecuted = true;
+                   
+                    // string logStrike = string.Format("{0} {1}", apiProcessor.Strike, apiProcessor.IsCEChecked ? "CE" : "PE");
+                    // LogMessage?.Invoke("Executed BANKNIFTY SELL strike " + logStrike);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage?.Invoke(ex.Message);
+            }
+        }
+
+        private async void ExecuteBUYForStraddle(int strike)
+        {
+            try
+            {
+                if (straddleTicks == null || straddleTicks.Count() < 1)
+                {
+                    LogMessage?.Invoke("Empty Strike");
+                    return;
+                }
+                Tick tick = straddleTicks[0];
+
+                if (tick != null)
+                {
+                    straddleTicks.Clear();
+                    int currentBankNifty = Convert.ToInt32(CurrentBankNifty);
+                    Is945StraddleExecuted = true;
+
+                    if (straddleTicks == null)
+                        straddleTicks = new List<Tick>();
+
+                    int iStrike = Round(strike);
+
+                    if (!string.IsNullOrEmpty(tick.Symbol) && tick.Symbol.ToLower().IndexOf("ce") > 0)
+                        straddleTicks.Add(apiProcessor.GetInstrumentTick($"BANKNIFTY {ExpiryWeek} {iStrike}.0 PE"));
+                    else if (!string.IsNullOrEmpty(tick.Symbol) && tick.Symbol.ToLower().IndexOf("pe") > 0)
+                        straddleTicks.Add(apiProcessor.GetInstrumentTick($"BANKNIFTY {ExpiryWeek} {iStrike}.0 CE"));
+
+                    if (straddleTicks != null && straddleTicks.Count > 0)
+                        OnStraddleTickMonitoringStart?.Invoke(straddleTicks);
+
+                    LogMessage?.Invoke("Executed BANKNIFTY BUY strike " + iStrike);
+                    if (!string.IsNullOrEmpty(tick.Symbol) && tick.Symbol.ToLower().IndexOf("ce") > 0)
+                    {
+                        apiProcessor.IsCEChecked = false;
+                        apiProcessor.IsPEChecked = true;
+                    }
+                    else if (!string.IsNullOrEmpty(tick.Symbol) && tick.Symbol.ToLower().IndexOf("pe") > 0)
+                    {
+                        apiProcessor.IsCEChecked = true;
+                        apiProcessor.IsPEChecked = false;
                     }
 
                     apiProcessor.IsStrangleChecked = true;
@@ -370,17 +488,17 @@ namespace TradingApplication.Strategy
                     // await apiProcessor.PlaceEntryOrder("BANKNIFTY");
                     //System.Threading.Thread.Sleep(10000);
 
-                    apiProcessor.IsStrangleChecked = false;
-                    apiProcessor.OTMDiff = 0;
-                    apiProcessor.Strike = Round(strike);
-                    apiProcessor.IsStopLossInPercent = false;
-                    apiProcessor.TransactionOrderType = "SELL";
+                    //apiProcessor.IsStrangleChecked = false;
+                    //apiProcessor.OTMDiff = 0;
+                    //apiProcessor.Strike = Round(strike);
+                    //apiProcessor.IsStopLossInPercent = false;
+                    //apiProcessor.TransactionOrderType = "SELL";
 
                     //await apiProcessor.PlaceEntryOrder("BANKNIFTY");
 
                     Is945StraddleExecuted = true;
-                    string logStrike = string.Format("{0} {1}", apiProcessor.Strike, apiProcessor.IsCEChecked ? "CE" : "PE");
-                    LogMessage?.Invoke("Executed BANKNIFTY SELL strike " + logStrike);
+                    //string logStrike = string.Format("{0} {1}", apiProcessor.Strike, apiProcessor.IsCEChecked ? "CE" : "PE");
+                    LogMessage?.Invoke("Executed BANKNIFTY BUY option ");
 
                 }
             }
@@ -422,7 +540,7 @@ namespace TradingApplication.Strategy
                     //await apiProcessor.ExitAllSELLOrders();
                     //System.Threading.Thread.Sleep(10000);
                     //await apiProcessor.ExitAllOrders("BANKNIFTY");
-                    LogMessage?.Invoke("BankNifty Short Straddle strategy target hit");
+                    //LogMessage?.Invoke("BankNifty Short Straddle strategy target hit");
                 }
             }
 
@@ -435,8 +553,9 @@ namespace TradingApplication.Strategy
                     {
                         if (tick.StopLoss == 0)
                         {
-                            tick.StopLoss = tick.LastPrice + 60;
-                            tick.Target = tick.LastPrice - 60;
+                            tick.InitialPrice = tick.LastPrice;
+                            tick.StopLoss = OptionLastStopLossPrice;
+                            tick.Target = tick.LastPrice - 50;
 
                             LogMessage?.Invoke("Executed " + tick.Symbol);
                             LogMessage?.Invoke("Buy Price " + tick.LastPrice);
@@ -444,9 +563,14 @@ namespace TradingApplication.Strategy
                             LogMessage?.Invoke("Target Price " + tick.Target);
                         }
 
-                        if (tick.LastPrice > tick.StopLoss || tick.LastPrice < tick.Target)
+                        if ((tick.LastPrice > tick.StopLoss || tick.LastPrice < tick.Target) && IsMTMExitEnabled)
                         {
                             executedTick = tick;
+
+                            await apiProcessor.ExitAllSELLOrders();
+                            System.Threading.Thread.Sleep(10000);
+                            await apiProcessor.ExitAllOrders("BANKNIFTY");
+
                             LogMessage?.Invoke("BankNifty Short Straddle strategy target hit");
                             OnStraddleTickMonitoringStop?.Invoke();
                         }

@@ -123,7 +123,7 @@ namespace TradingApplication.Strategy
                 var dialogs = (TLDialogs)await _client.GetUserDialogsAsync();
                 var chat = dialogs.Chats
                     .OfType<TLChannel>()
-                    .FirstOrDefault(c => c.Title == "ENGINEERS OF BANKNIFTY");//.FirstOrDefault(c => c.Title == "Trade Easy Free Calls");.FirstOrDefault(c => c.Title == "Trading Hub");.FirstOrDefault(c => c.Title == "TradingView");
+                    .FirstOrDefault(c => c.Title == "Intraday Banknifty Call");//.FirstOrDefault(c => c.Title == "Trade Easy Free Calls");.FirstOrDefault(c => c.Title == "Trading Hub");.FirstOrDefault(c => c.Title == "TradingView");
 
 
                 TLAbsMessages messages = await _client.GetHistoryAsync(new TLInputPeerChannel() { ChannelId = chat.Id, AccessHash = chat.AccessHash.Value }, limit: 1);

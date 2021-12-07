@@ -54,8 +54,8 @@
 
         <TextBlock Grid.Row="2" Grid.Column="1"  Margin="0,0,0,10"  Text="Strike"/>
         <ComboBox Grid.Row="2" Grid.Column="1" Margin="50,0,0,10" Name="cmbSymbol" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="25">
-            <ComboBoxItem Content="BANKNIFTY" ></ComboBoxItem>
-            <ComboBoxItem Content="NIFTY" IsSelected="True"></ComboBoxItem>
+            <ComboBoxItem Content="BANKNIFTY"  IsSelected="True"></ComboBoxItem>
+            <ComboBoxItem Content="NIFTY"></ComboBoxItem>
         </ComboBox>
         <TextBox  Grid.Row="2" Grid.Column="2" Name ="txtStrike" Width="100" Margin="0,0,0,10" HorizontalAlignment="Left"/>
 
@@ -96,22 +96,35 @@
             <TabItem Header="BankNifty">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30*"/>
-                        <ColumnDefinition Width="87*"/>
+                        <ColumnDefinition Width="40*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="20*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyCE" Margin="0,15,0,107" Grid.ColumnSpan="2" Width="175">BankNifty 35500 CE</TextBlock>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyPE" Margin="1,31,0,91" RenderTransformOrigin="-0.111,0.312" Grid.ColumnSpan="2" Width="187">BankNifty 35500 PE</TextBlock>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyCEValue" Margin="78,15,0,107" Grid.Column="1" RenderTransformOrigin="2.021,0.5">CE Value</TextBlock>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyPEValue" Margin="78,33,0,89" RenderTransformOrigin="-0.111,0.312" Grid.Column="1">PE Value</TextBlock>
-                    <TextBox  Grid.Row="1" Grid.Column="1" Name ="txtBankNiftySL" Width="80" Margin="0,0,0,10" Height="20" HorizontalAlignment="Left"/>
-                    <TextBlock Grid.Row="1" VerticalAlignment="Center"  Text="Stop Loss : "/>
-                    <Button Grid.Row="1" Grid.Column="1" Width="110"  HorizontalAlignment="Left" Content="Start BN Strategy"  Name="btnBankNiftyStrategy"  Click="btnBankNiftyStrategy_Click" Height="26" Margin="187,51,0,61"  />
-                    <TextBlock Grid.Row="1" VerticalAlignment="Center"  Text="Bank Nifty Strategy MTM : " Grid.ColumnSpan="2" Margin="0,82,304,40"/>
-                    <TextBlock Grid.Row="1" Width="68" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyStrategyMTM" Margin="58,82,0,40" RenderTransformOrigin="1.221,1.44" Grid.Column="1">MTM value</TextBlock>
+                    <TextBlock FontSize="14" FontWeight="Bold" Grid.Row="0" Grid.Column="0"  Text="BankNifty Option" Height="25"  VerticalAlignment="Top" Width="210" />
+                    <TextBlock FontSize="14" FontWeight="Bold" Grid.Row="0" Grid.Column="1"  Text="Initial" Height="25"  VerticalAlignment="Top" Width="100" />
+                    <TextBlock FontSize="14" FontWeight="Bold" Grid.Row="0" Grid.Column="2"  Text="Stop Loss" Height="25"  VerticalAlignment="Top" Width="100" />
+                    <TextBlock FontSize="14" FontWeight="Bold" Grid.Row="0" Grid.Column="3"  Text="Current Value" Height="25"  VerticalAlignment="Top" Width="100" />
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyCE" >BankNifty 35500 CE</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyCEInitial" >initial</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyCESL" >SL</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="3" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyCEValue"  >CE Value</TextBlock>
+                    
+                    <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyPE" >BankNifty 35500 PE</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyPEInitial" >initial</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyPESL" >SL</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="3" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyPEValue" >PE Value</TextBlock>
+
+                    <Button Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2"  Grid.RowSpan="2"  HorizontalAlignment="Left" Content="Start BN Strategy" Margin="10,10,0,0"  Name="btnBankNiftyStrategy"  Click="btnBankNiftyStrategy_Click" Height="26"   />
+                    <!--<TextBlock Grid.Row="3" VerticalAlignment="Center"  Text="Bank Nifty Strategy MTM : " Grid.ColumnSpan="2" Margin="0,82,304,40"/>
+                    <TextBlock Grid.Row="3" Width="68" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyStrategyMTM" Margin="58,82,0,40" RenderTransformOrigin="1.221,1.44" Grid.Column="1">MTM value</TextBlock>-->
                 </Grid>
             </TabItem>
             <TabItem Header="Telegram Strategy">

@@ -28,6 +28,7 @@ namespace AliceBlueWrapper.Models
         public decimal StopLoss { get; set; }
         public decimal Target { get; set; }
         public decimal InitialPrice { get; set; }
+        public int Strike { get; set; }
 
         public DateTime? LastTradeTime { get; set; }
         public UInt32 OI { get; set; }

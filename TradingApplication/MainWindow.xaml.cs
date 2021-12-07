@@ -93,6 +93,7 @@ namespace TradingApplication
         private void AddLogs(string log)
         {
             txtLogs.Text += DateTime.Now.ToString() + ":  " + log + Environment.NewLine;
+            FileLogger.Write(log, FileLogger.MsgType.Info);
         }
 
         private void CheckToken()
@@ -317,7 +318,11 @@ namespace TradingApplication
             btnMTMExit.Content = "Start MTM Exit";
             //tblMTM.Text = "MTM value";
             //mtmConnect.TimerStop();
-            mtmConnect.IsMTMExitEnabled = false;
+           // mtmConnect.IsMTMExitEnabled = false;
+
+            if (bankNiftyShortStraddleStrategy != null)
+                bankNiftyShortStraddleStrategy.IsMTMExitEnabled = false;
+
             AddLogs("MTM Exit ended.");
         }
 
@@ -333,7 +338,11 @@ namespace TradingApplication
             double.TryParse(txtMaxLoss.Text, out mtmConnect.MaxLossMTM);
             int.TryParse(txtSL.Text, out mtmConnect.StopLossForCoverOrder);
 
-            mtmConnect.IsMTMExitEnabled = true;
+            //mtmConnect.IsMTMExitEnabled = true;
+
+            if (bankNiftyShortStraddleStrategy != null)
+                bankNiftyShortStraddleStrategy.IsMTMExitEnabled = true;
+
             //mtmConnect.TimerStart();
             btnMTMExit.Content = "Stop MTM Exit";
             AddLogs("MTM Exit timer started.");
@@ -375,7 +384,7 @@ namespace TradingApplication
 
             if(bankNiftyShortStraddleStrategy != null)
             {
-                txtBankNiftyStrategyMTM.Text = bankNiftyShortStraddleStrategy.DayM2m.ToString();
+                //txtBankNiftyStrategyMTM.Text = bankNiftyShortStraddleStrategy.DayM2m.ToString();
             }
         }
 
@@ -678,8 +687,13 @@ namespace TradingApplication
 
                 txtBankNiftyCE.Text = string.Empty;
                 txtBankNiftyCEValue.Text = string.Empty;
+                txtBankNiftyCEInitial.Text = string.Empty;
+                txtBankNiftyCESL.Text = string.Empty;
+
                 txtBankNiftyPE.Text = string.Empty;
                 txtBankNiftyPEValue.Text = string.Empty;
+                txtBankNiftyPEInitial.Text = string.Empty;
+                txtBankNiftyPESL.Text = string.Empty;
 
                 foreach (Tick item in tickerTicks)
                 {
@@ -687,11 +701,15 @@ namespace TradingApplication
                     {
                         txtBankNiftyCE.Text = item.Symbol;
                         txtBankNiftyCEValue.Text = item.LastPrice.ToString();
+                        txtBankNiftyCEInitial.Text = item.InitialPrice.ToString();
+                        txtBankNiftyCESL.Text = item.StopLoss.ToString();
                     }
                     else if (!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("pe") > 0)
                     {
                         txtBankNiftyPE.Text = item.Symbol;
                         txtBankNiftyPEValue.Text = item.LastPrice.ToString();
+                        txtBankNiftyPEInitial.Text = item.InitialPrice.ToString();
+                        txtBankNiftyPESL.Text = item.StopLoss.ToString();
                     }
                 }
             }
