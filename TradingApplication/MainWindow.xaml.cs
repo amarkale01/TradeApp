@@ -33,6 +33,7 @@ namespace TradingApplication
         StrategyConnect strategyConnect = null;
         BankNiftyTelegramStrategy bankNiftyTelegramStrategy = null;
         BankNiftyShortStraddleStrategy bankNiftyShortStraddleStrategy = null;
+        BankNiftyLongStraddleStrategy bankNiftyLongStraddleStrategy = null;
         APIProcessor apiProcessor;
         Helper helper;
         List<Tick> tickerTicks = null;
@@ -170,19 +171,28 @@ namespace TradingApplication
                 else
                     apiProcessor.IsStopLossInPercent = false;
 
-                apiProcessor.Lots = Convert.ToInt32(txtLots.Text);
+                if (cmbOrderType.Text.IndexOf("SELL") >= 0)
+                {
+                    SellWithHedge();
+                }
+                else
+                {
+                    apiProcessor.Lots = Convert.ToInt32(txtLots.Text);
 
-                apiProcessor.TakeProfitForOrder = "35";
-                apiProcessor.TransactionOrderType = cmbOrderType.Text;
+                    apiProcessor.TakeProfitForOrder = "35";
+                    apiProcessor.TransactionOrderType = cmbOrderType.Text;
 
-                await apiProcessor.PlaceEntryOrder(cmbSymbol.Text);
-                System.Threading.Thread.Sleep(10000);
-                await apiProcessor.GetOrderHistory();
-                //await apiProcessor.PlaceStopLossOrder(apiProcessor.ExecutedOrders);
-                //await apiProcessor.PlaceTargetOrder(apiProcessor.ExecutedOrders);
+                    await apiProcessor.PlaceEntryOrder(cmbSymbol.Text);
+                    System.Threading.Thread.Sleep(10000);
+                    await apiProcessor.GetOrderHistory();
+                    //await apiProcessor.PlaceStopLossOrder(apiProcessor.ExecutedOrders);
+                    //await apiProcessor.PlaceTargetOrder(apiProcessor.ExecutedOrders);
+                    
+
+                    //BankNiftyTelegramStrategy_OnBuyExecuted("Manual entry done");
+                }
+
                 btnEntry.IsEnabled = true;
-
-                //BankNiftyTelegramStrategy_OnBuyExecuted("Manual entry done");
             }
             catch (Exception ex)
             {
@@ -323,6 +333,9 @@ namespace TradingApplication
             if (bankNiftyShortStraddleStrategy != null)
                 bankNiftyShortStraddleStrategy.IsMTMExitEnabled = false;
 
+            if (bankNiftyLongStraddleStrategy != null)
+                bankNiftyLongStraddleStrategy.IsMTMExitEnabled = false;
+
             AddLogs("MTM Exit ended.");
         }
 
@@ -342,6 +355,9 @@ namespace TradingApplication
 
             if (bankNiftyShortStraddleStrategy != null)
                 bankNiftyShortStraddleStrategy.IsMTMExitEnabled = true;
+
+            if (bankNiftyLongStraddleStrategy != null)
+                bankNiftyLongStraddleStrategy.IsMTMExitEnabled = true;
 
             //mtmConnect.TimerStart();
             btnMTMExit.Content = "Stop MTM Exit";
@@ -523,25 +539,91 @@ namespace TradingApplication
         {
             try
             {
-                
+
                 if (btnBankNiftyStrategy.Content.ToString().Contains("Start"))
                 {
-                    btnBankNiftyStrategy.Content = "Stop BN Strategy";
-                    bankNiftyShortStraddleStrategy = new BankNiftyShortStraddleStrategy();
-                    bankNiftyShortStraddleStrategy.LogMessage += MTMConnectError;
-                    bankNiftyShortStraddleStrategy.OnStraddleTickMonitoringStart += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStart;
-                    bankNiftyShortStraddleStrategy.OnStraddleTickStopLossHit += BankNiftyShortStraddleStrategy_OnStraddleTickStopLossHit;
-                    bankNiftyShortStraddleStrategy.OnStraddleTickMonitoringStop += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStop;
-                    bankNiftyShortStraddleStrategy.Is945StraddleEnabled = true;
-                    bankNiftyShortStraddleStrategy.ExpiryWeek = tradeSetting.ExpiryWeek;
-                    bankNiftyShortStraddleStrategy.Subscribe(apiProcessor);
+                    if (btnBankNiftyBUYStrategy.Content.ToString().Contains("Start"))
+                    {
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(Colors.Black, 0));
+                        Color color = (Color)ColorConverter.ConvertFromString("#FFBC3737");
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color, 1));
+
+                        btnBankNiftyStrategy.Content = "Stop SELL Strategy";
+                        bankNiftyShortStraddleStrategy = new BankNiftyShortStraddleStrategy();
+                        bankNiftyShortStraddleStrategy.LogMessage += MTMConnectError;
+                        bankNiftyShortStraddleStrategy.OnStraddleTickMonitoringStart += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStart;
+                        bankNiftyShortStraddleStrategy.OnStraddleTickStopLossHit += BankNiftyShortStraddleStrategy_OnStraddleTickStopLossHit;
+                        bankNiftyShortStraddleStrategy.OnStraddleTickMonitoringStop += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStop;
+                        bankNiftyShortStraddleStrategy.Is945StraddleEnabled = true;
+                        bankNiftyShortStraddleStrategy.ExpiryWeek = tradeSetting.ExpiryWeek;
+                        bankNiftyShortStraddleStrategy.Subscribe(apiProcessor);
+                    }
+                    else
+                        MessageBox.Show("BankNifty BUY Strategy in progress.");
                 }
                 else
                 {
-                    btnBankNiftyStrategy.Content = "Start BN Strategy";
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                    Color color1 = (Color)ColorConverter.ConvertFromString("#FF0B212C");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color1, 0));
+                    Color color2 = (Color)ColorConverter.ConvertFromString("#FF40789E");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color2, 1));
+
+                    btnBankNiftyStrategy.Content = "Start SELL Strategy";
 
                     if (bankNiftyShortStraddleStrategy != null)
                         bankNiftyShortStraddleStrategy.Unsubscribe();
+
+                    tickerTicks = new List<Tick>();
+                }
+            }
+            catch (Exception ex)
+            {
+                AddLogs("Error while starting strategy.");
+            }
+        }
+
+        private void btnBankNiftyBUYStrategy_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+
+                if (btnBankNiftyBUYStrategy.Content.ToString().Contains("Start"))
+                {
+                    if (btnBankNiftyStrategy.Content.ToString().Contains("Start"))
+                    {
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(Colors.Black, 0));
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(Colors.GreenYellow, 1));
+
+
+
+                        btnBankNiftyBUYStrategy.Content = "Stop BUY Strategy";
+                        bankNiftyLongStraddleStrategy = new BankNiftyLongStraddleStrategy();
+                        bankNiftyLongStraddleStrategy.LogMessage += MTMConnectError;
+                        bankNiftyLongStraddleStrategy.OnStraddleTickMonitoringStart += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStart;
+                        bankNiftyLongStraddleStrategy.OnStraddleTickStopLossHit += BankNiftyShortStraddleStrategy_OnStraddleTickStopLossHit;
+                        bankNiftyLongStraddleStrategy.OnStraddleTickMonitoringStop += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStop;
+                        bankNiftyLongStraddleStrategy.Is945StraddleEnabled = true;
+                        bankNiftyLongStraddleStrategy.ExpiryWeek = tradeSetting.ExpiryWeek;
+                        bankNiftyLongStraddleStrategy.Subscribe(apiProcessor);
+                    }
+                    else
+                        MessageBox.Show("BankNifty SELL Strategy in progress.");
+                }
+                else
+                {
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                    Color color1 = (Color)ColorConverter.ConvertFromString("#FF0B212C");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color1, 0));
+                    Color color2 = (Color)ColorConverter.ConvertFromString("#FF40789E");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color2, 1));
+
+                    btnBankNiftyBUYStrategy.Content = "Start BUY Strategy";
+
+                    if (bankNiftyLongStraddleStrategy != null)
+                        bankNiftyLongStraddleStrategy.Unsubscribe();
 
                     tickerTicks = new List<Tick>();
                 }
@@ -678,6 +760,12 @@ namespace TradingApplication
                 bankNiftyShortStraddleStrategy.CurrentStrategyPosition = mtmConnect.dayPosition;
             }
 
+            if (bankNiftyLongStraddleStrategy != null)
+            {
+                bankNiftyLongStraddleStrategy.CurrentBankNifty = value;
+                bankNiftyLongStraddleStrategy.CurrentStrategyPosition = mtmConnect.dayPosition;
+            }
+
         }
 
         private void SetBankNiftyStraddleTiker()
@@ -757,6 +845,23 @@ namespace TradingApplication
                 }
             }
 
+            if (bankNiftyLongStraddleStrategy != null)
+            {
+                if (tick.InstrumentToken == tickerConnect.BANKNIFTY_INSTRUMENT_TOKEN)
+                    bankNiftyLongStraddleStrategy.CurrentBankNifty = tick.LastPrice.ToString();
+
+                bankNiftyLongStraddleStrategy.CurrentStrategyPosition = mtmConnect.dayPosition;
+
+                if (bankNiftyLongStraddleStrategy.straddleTicks != null)
+                {
+                    Tick selectedTick = bankNiftyLongStraddleStrategy.straddleTicks.Where(s => s.InstrumentToken == tick.InstrumentToken).FirstOrDefault();
+                    if (selectedTick != null)
+                    {
+                        selectedTick.LastPrice = tick.LastPrice;
+                    }
+                }
+            }
+
             SetBankNiftyStraddleTiker();
         }
 
@@ -772,6 +877,34 @@ namespace TradingApplication
             {
                 tickerConnect.SubscribeTicker(tradeSetting.Token, tickerTicks);
             }
+        }
+
+        public async void SellWithHedge()
+        {
+            apiProcessor.IsCEChecked = Convert.ToBoolean(chkCallChecked.IsChecked);
+            apiProcessor.IsPEChecked = Convert.ToBoolean(chkPutChecked.IsChecked);
+
+            apiProcessor.Lots = Convert.ToInt32(txtLots.Text);
+            apiProcessor.IsStrangleChecked = true;
+            apiProcessor.Strike = Convert.ToInt32(txtStrike.Text);
+            apiProcessor.OTMDiff = 500;
+            apiProcessor.StopLossForOrder = "60";
+            apiProcessor.IsStopLossInPercent = false;
+            apiProcessor.TransactionOrderType = "BUY";
+
+            await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+            System.Threading.Thread.Sleep(20000);
+
+
+            apiProcessor.IsStrangleChecked = false;
+            apiProcessor.OTMDiff = 0;
+            apiProcessor.Strike = Convert.ToInt32(txtStrike.Text);
+            apiProcessor.IsStopLossInPercent = false;
+            apiProcessor.TransactionOrderType = "SELL";
+
+            await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+            
+            AddLogs("Executed BANKNIFTY SELL strike " + apiProcessor.Strike);
         }
 
 

@@ -7,3 +7,6 @@
 /TradingApplication/bin/Release
 /AliceBlueWrapper/obj
 /AliceBlueWrapper/bin/Release/netstandard2.0
+/AliceBlueWrapper/bin/Debug/netstandard2.0
+/TradingApplication/bin/Debug
+/TradingApplication/obj/Debug

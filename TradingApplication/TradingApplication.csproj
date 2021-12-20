@@ -71,6 +71,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\FileLogger.cs" />
+    <Compile Include="Strategy\BankNiftyLongStraddleStrategy.cs" />
     <Compile Include="Strategy\BankNiftyOptionSpreadStrategy.cs" />
     <Compile Include="Strategy\BankNiftyShortStraddleStrategy.cs" />
     <Compile Include="Strategy\BankNiftyTelegramStrategy.cs" />
