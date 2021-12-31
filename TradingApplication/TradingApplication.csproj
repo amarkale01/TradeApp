@@ -75,6 +75,7 @@
     <Compile Include="Strategy\BankNiftyOptionSpreadStrategy.cs" />
     <Compile Include="Strategy\BankNiftyShortStraddleStrategy.cs" />
     <Compile Include="Strategy\BankNiftyTelegramStrategy.cs" />
+    <Compile Include="Strategy\NiftyShortStraddleStrategy.cs" />
     <Compile Include="Strategy\StrategyBase.cs" />
     <Compile Include="Strategy\StrategyManager.cs" />
     <Page Include="MainWindow.xaml">

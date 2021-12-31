@@ -17,6 +17,7 @@ namespace Trading_App.Common
         public event OnErrorHandler OnError;
 
         public uint BANKNIFTY_INSTRUMENT_TOKEN = 26009;
+        public uint NIFTY_INSTRUMENT_TOKEN = 26000;
 
         Timer timer;
         APIProcessor apiProcessor;

@@ -34,6 +34,7 @@ namespace TradingApplication
         BankNiftyTelegramStrategy bankNiftyTelegramStrategy = null;
         BankNiftyShortStraddleStrategy bankNiftyShortStraddleStrategy = null;
         BankNiftyLongStraddleStrategy bankNiftyLongStraddleStrategy = null;
+        NiftyShortStraddleStrategy niftyShortStraddleStrategy = null;
         APIProcessor apiProcessor;
         Helper helper;
         List<Tick> tickerTicks = null;
@@ -634,6 +635,105 @@ namespace TradingApplication
             }
         }
 
+        private void btnNiftyStrategy_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+
+                if (btnNiftyStrategy.Content.ToString().Contains("Start"))
+                {
+                    if (btnNiftyBUYStrategy.Content.ToString().Contains("Start"))
+                    {
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(Colors.Black, 0));
+                        Color color = (Color)ColorConverter.ConvertFromString("#FFBC3737");
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color, 1));
+
+                        btnNiftyStrategy.Content = "Stop SELL Strategy";
+                        niftyShortStraddleStrategy = new NiftyShortStraddleStrategy();
+                        niftyShortStraddleStrategy.LogMessage += MTMConnectError;
+                        niftyShortStraddleStrategy.OnStraddleTickMonitoringStart += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStart;
+                        niftyShortStraddleStrategy.OnStraddleTickStopLossHit += BankNiftyShortStraddleStrategy_OnStraddleTickStopLossHit;
+                        niftyShortStraddleStrategy.OnStraddleTickMonitoringStop += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStop;
+                        niftyShortStraddleStrategy.Is945StraddleEnabled = true;
+                        niftyShortStraddleStrategy.ExpiryWeek = tradeSetting.ExpiryWeek;
+                        niftyShortStraddleStrategy.Subscribe(apiProcessor);
+                    }
+                    else
+                        MessageBox.Show("BankNifty BUY Strategy in progress.");
+                }
+                else
+                {
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                    Color color1 = (Color)ColorConverter.ConvertFromString("#FF0B212C");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color1, 0));
+                    Color color2 = (Color)ColorConverter.ConvertFromString("#FF40789E");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color2, 1));
+
+                    btnNiftyStrategy.Content = "Start SELL Strategy";
+
+                    if (niftyShortStraddleStrategy != null)
+                        niftyShortStraddleStrategy.Unsubscribe();
+
+                    tickerTicks = new List<Tick>();
+                }
+            }
+            catch (Exception ex)
+            {
+                AddLogs("Error while starting strategy.");
+            }
+        }
+
+        private void btnNiftyBUYStrategy_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+
+                if (btnNiftyBUYStrategy.Content.ToString().Contains("Start"))
+                {
+                    if (btnNiftyStrategy.Content.ToString().Contains("Start"))
+                    {
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(Colors.Black, 0));
+                        ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(Colors.GreenYellow, 1));
+
+
+
+                        btnNiftyBUYStrategy.Content = "Stop BUY Strategy";
+                        //bankNiftyLongStraddleStrategy = new BankNiftyLongStraddleStrategy();
+                        //bankNiftyLongStraddleStrategy.LogMessage += MTMConnectError;
+                        //bankNiftyLongStraddleStrategy.OnStraddleTickMonitoringStart += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStart;
+                        //bankNiftyLongStraddleStrategy.OnStraddleTickStopLossHit += BankNiftyShortStraddleStrategy_OnStraddleTickStopLossHit;
+                        //bankNiftyLongStraddleStrategy.OnStraddleTickMonitoringStop += BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStop;
+                        //bankNiftyLongStraddleStrategy.Is945StraddleEnabled = true;
+                        //bankNiftyLongStraddleStrategy.ExpiryWeek = tradeSetting.ExpiryWeek;
+                        //bankNiftyLongStraddleStrategy.Subscribe(apiProcessor);
+                    }
+                    else
+                        MessageBox.Show("BankNifty SELL Strategy in progress.");
+                }
+                else
+                {
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Clear();
+                    Color color1 = (Color)ColorConverter.ConvertFromString("#FF0B212C");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color1, 0));
+                    Color color2 = (Color)ColorConverter.ConvertFromString("#FF40789E");
+                    ((System.Windows.Media.GradientBrush)grdMain.Background).GradientStops.Add(new GradientStop(color2, 1));
+
+                    btnNiftyBUYStrategy.Content = "Start BUY Strategy";
+
+                    //if (bankNiftyLongStraddleStrategy != null)
+                    //    bankNiftyLongStraddleStrategy.Unsubscribe();
+
+                    tickerTicks = new List<Tick>();
+                }
+            }
+            catch (Exception ex)
+            {
+                AddLogs("Error while starting strategy.");
+            }
+        }
+
         private void BankNiftyShortStraddleStrategy_OnStraddleTickMonitoringStop()
         {
             Dispatcher.BeginInvoke(new StraddleTickMonitoringStop(StopStraddleMonitoring));
@@ -651,12 +751,13 @@ namespace TradingApplication
 
         private void SubscribeStraddleTicker(List<Tick> ticks)
         {
-            tickerTicks = null;
+            //tickerTicks = null;
 
             if (tickerTicks == null)
             {
                 tickerTicks = new List<Tick>();
                 tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.BANKNIFTY_INSTRUMENT_TOKEN, Mode = "1" });
+                tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.NIFTY_INSTRUMENT_TOKEN, Mode = "1" });
             }
 
             tickerTicks.AddRange(ticks);
@@ -673,6 +774,7 @@ namespace TradingApplication
             {
                 tickerTicks = new List<Tick>();
                 tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.BANKNIFTY_INSTRUMENT_TOKEN, Mode = "1" });
+                tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.NIFTY_INSTRUMENT_TOKEN, Mode = "1" });
             }
 
             Tick removeTick = tickerTicks.Where(s => s.InstrumentToken == tick.InstrumentToken).FirstOrDefault();
@@ -688,12 +790,13 @@ namespace TradingApplication
 
         private void StopStraddleMonitoring()
         {
-            tickerTicks = null;
+            //tickerTicks = null;
 
             if (tickerTicks == null)
             {
                 tickerTicks = new List<Tick>();
                 tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.BANKNIFTY_INSTRUMENT_TOKEN, Mode = "1" });
+                tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.NIFTY_INSTRUMENT_TOKEN, Mode = "1" });
             }
             
             if (chkTokenGenerated.IsChecked == true)
@@ -783,21 +886,45 @@ namespace TradingApplication
                 txtBankNiftyPEInitial.Text = string.Empty;
                 txtBankNiftyPESL.Text = string.Empty;
 
+                txtNiftyCE.Text = string.Empty;
+                txtNiftyCEValue.Text = string.Empty;
+                txtNiftyCEInitial.Text = string.Empty;
+                txtNiftyCESL.Text = string.Empty;
+
+                txtNiftyPE.Text = string.Empty;
+                txtNiftyPEValue.Text = string.Empty;
+                txtNiftyPEInitial.Text = string.Empty;
+                txtNiftyPESL.Text = string.Empty;
+
                 foreach (Tick item in tickerTicks)
                 {
-                    if(!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("ce") > 0)
+                    if(!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("bank") > -1 && item.Symbol.ToLower().IndexOf("ce") > 0)
                     {
                         txtBankNiftyCE.Text = item.Symbol;
                         txtBankNiftyCEValue.Text = item.LastPrice.ToString();
                         txtBankNiftyCEInitial.Text = item.InitialPrice.ToString();
                         txtBankNiftyCESL.Text = item.StopLoss.ToString();
                     }
-                    else if (!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("pe") > 0)
+                    else if (!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("bank") > -1 && item.Symbol.ToLower().IndexOf("pe") > 0)
                     {
                         txtBankNiftyPE.Text = item.Symbol;
                         txtBankNiftyPEValue.Text = item.LastPrice.ToString();
                         txtBankNiftyPEInitial.Text = item.InitialPrice.ToString();
                         txtBankNiftyPESL.Text = item.StopLoss.ToString();
+                    }
+                    else if (!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("ce") > 0)
+                    {
+                        txtNiftyCE.Text = item.Symbol;
+                        txtNiftyCEValue.Text = item.LastPrice.ToString();
+                        txtNiftyCEInitial.Text = item.InitialPrice.ToString();
+                        txtNiftyCESL.Text = item.StopLoss.ToString();
+                    }
+                    else if (!string.IsNullOrEmpty(item.Symbol) && item.Symbol.ToLower().IndexOf("pe") > 0)
+                    {
+                        txtNiftyPE.Text = item.Symbol;
+                        txtNiftyPEValue.Text = item.LastPrice.ToString();
+                        txtNiftyPEInitial.Text = item.InitialPrice.ToString();
+                        txtNiftyPESL.Text = item.StopLoss.ToString();
                     }
                 }
             }
@@ -812,6 +939,11 @@ namespace TradingApplication
                 {
                     lblBanknifty.Text = tick.LastPrice.ToString();
                     strategyConnect.Strike = tick.LastPrice.ToString();
+                }
+                else if (tick.InstrumentToken == tickerConnect.NIFTY_INSTRUMENT_TOKEN)
+                {
+                    lblNifty.Text = tick.LastPrice.ToString();
+                    //strategyConnect.Strike = tick.LastPrice.ToString();
                 }
                 else
                 {
@@ -862,6 +994,23 @@ namespace TradingApplication
                 }
             }
 
+            if (niftyShortStraddleStrategy != null)
+            {
+                if (tick.InstrumentToken == tickerConnect.NIFTY_INSTRUMENT_TOKEN)
+                    niftyShortStraddleStrategy.CurrentNifty = tick.LastPrice.ToString();
+
+                niftyShortStraddleStrategy.CurrentStrategyPosition = mtmConnect.dayPosition;
+
+                if (niftyShortStraddleStrategy.straddleTicks != null)
+                {
+                    Tick selectedTick = niftyShortStraddleStrategy.straddleTicks.Where(s => s.InstrumentToken == tick.InstrumentToken).FirstOrDefault();
+                    if (selectedTick != null)
+                    {
+                        selectedTick.LastPrice = tick.LastPrice;
+                    }
+                }
+            }
+
             SetBankNiftyStraddleTiker();
         }
 
@@ -871,6 +1020,8 @@ namespace TradingApplication
             {
                 tickerTicks = new List<Tick>();
                 tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.BANKNIFTY_INSTRUMENT_TOKEN, Mode="1"});//[4, 219002]
+                tickerTicks.Add(new Tick() { InstrumentToken = tickerConnect.NIFTY_INSTRUMENT_TOKEN, Mode = "1" });//[4, 219002]
+
             }
 
             if (chkTokenGenerated.IsChecked == true)
@@ -887,14 +1038,16 @@ namespace TradingApplication
             apiProcessor.Lots = Convert.ToInt32(txtLots.Text);
             apiProcessor.IsStrangleChecked = true;
             apiProcessor.Strike = Convert.ToInt32(txtStrike.Text);
-            apiProcessor.OTMDiff = 500;
+            if(string.Compare(cmbSymbol.Text,"Nifty",true) == 0)
+                apiProcessor.OTMDiff = 500;
+            else
+                apiProcessor.OTMDiff = Convert.ToInt32(tradeSetting.OTMDiff);
             apiProcessor.StopLossForOrder = "60";
             apiProcessor.IsStopLossInPercent = false;
             apiProcessor.TransactionOrderType = "BUY";
 
-            await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+            await apiProcessor.PlaceEntryOrder(cmbSymbol.Text);
             System.Threading.Thread.Sleep(20000);
-
 
             apiProcessor.IsStrangleChecked = false;
             apiProcessor.OTMDiff = 0;
@@ -902,9 +1055,9 @@ namespace TradingApplication
             apiProcessor.IsStopLossInPercent = false;
             apiProcessor.TransactionOrderType = "SELL";
 
-            await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+            await apiProcessor.PlaceEntryOrder(cmbSymbol.Text);
             
-            AddLogs("Executed BANKNIFTY SELL strike " + apiProcessor.Strike);
+            AddLogs("Executed " + cmbSymbol.Text + " SELL strike " + apiProcessor.Strike);
         }
 
 

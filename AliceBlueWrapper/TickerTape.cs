@@ -133,7 +133,7 @@ namespace AliceBlueWrapper
            
             //msg = "{\"a\": \"subscribe\", \"v\": [[1, 26000]], \"m\": \"marketdata\"}";//working nifty
 
-            msg = "{\"a\": \"subscribe\", \"v\": [[1, 26009],[2, 43341]], \"m\": \"marketdata\"}";//working bank nifty
+            msg = "{\"a\": \"subscribe\", \"v\": [[1, 26009],[1, 26000]], \"m\": \"marketdata\"}";//working bank nifty
 
            // msg = "{\"a\": \"subscribe\", \"v\": [[4, 219002]], \"m\": \"marketdata\"}";//working silverm
 
