@@ -45,6 +45,7 @@ namespace TradingApplication.Strategy
         public double StopLossPercentage = 1.20;
         public List<Tick> straddleTicks = null;
         public string ExpiryWeek = string.Empty;
+        public bool IsExecuteTrades = false;
 
         public BankNiftyShortStraddleStrategy()
         {
@@ -415,8 +416,11 @@ namespace TradingApplication.Strategy
                     apiProcessor.IsStopLossInPercent = false;
                     apiProcessor.TransactionOrderType = "BUY";
 
-                    await apiProcessor.PlaceEntryOrder("BANKNIFTY");
-                    System.Threading.Thread.Sleep(20000);
+                    if (IsExecuteTrades)
+                    {
+                        await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+                        System.Threading.Thread.Sleep(20000);
+                    }
 
 
                     apiProcessor.IsStrangleChecked = false;
@@ -425,7 +429,10 @@ namespace TradingApplication.Strategy
                     apiProcessor.IsStopLossInPercent = false;
                     apiProcessor.TransactionOrderType = "SELL";
 
-                    await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+                    if (IsExecuteTrades)
+                    {
+                        await apiProcessor.PlaceEntryOrder("BANKNIFTY");
+                    }
 
                     Is945StraddleExecuted = true;
                     IsStraddleUnderMonitoring = false;
@@ -561,7 +568,7 @@ namespace TradingApplication.Strategy
                             {
                                 tick.InitialPrice = tick.LastPrice;
                                 tick.StopLoss = OptionLastStopLossPrice;
-                                tick.Target = tick.LastPrice - 80;
+                                tick.Target = tick.LastPrice - 100;
 
                                 LogMessage?.Invoke("Executed " + tick.Symbol);
                                 LogMessage?.Invoke("SELL Price " + tick.LastPrice);

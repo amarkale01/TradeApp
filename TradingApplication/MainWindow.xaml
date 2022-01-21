@@ -125,6 +125,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Center"  Name="txtBankNiftyPESL" >SL</TextBlock>
                     <TextBlock Grid.Row="2" Grid.Column="3" HorizontalAlignment="Left" Foreground="Red" VerticalAlignment="Center" FontWeight="Bold" Name="txtBankNiftyPEValue" >PE Value</TextBlock>
 
+                    <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="False" Margin="70,15,0,0" Click="ChkExecuteBankNiftyTrades_Click" Name="chkExecuteBankNiftyTrades">Execute Trades</CheckBox>
                     <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"  Grid.RowSpan="2"  HorizontalAlignment="Left" Content="Start SELL Strategy" Margin="0,10,0,0"  Name="btnBankNiftyStrategy"  Click="btnBankNiftyStrategy_Click" Height="26"   />
                     <Button Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"  Grid.RowSpan="2"  HorizontalAlignment="Left" Content="Start BUY Strategy" Margin="0,10,0,0"  Name="btnBankNiftyBUYStrategy"  Click="btnBankNiftyBUYStrategy_Click" Height="26"   />
                     <!--<TextBlock Grid.Row="3" VerticalAlignment="Center"  Text="Bank Nifty Strategy MTM : " Grid.ColumnSpan="2" Margin="0,82,304,40"/>

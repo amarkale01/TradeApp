@@ -1059,7 +1059,25 @@ namespace TradingApplication
             
             AddLogs("Executed " + cmbSymbol.Text + " SELL strike " + apiProcessor.Strike);
         }
-
-
+                
+        private void ChkExecuteBankNiftyTrades_Click(object sender, RoutedEventArgs e)
+        {
+            if(chkExecuteBankNiftyTrades.IsChecked == true)
+            {
+                if(bankNiftyShortStraddleStrategy != null)
+                {
+                    bankNiftyShortStraddleStrategy.IsExecuteTrades = true;
+                    AddLogs("Execute trades is enabled. ");
+                }
+            }
+            else
+            {
+                if (bankNiftyShortStraddleStrategy != null)
+                {
+                    bankNiftyShortStraddleStrategy.IsExecuteTrades = false;
+                    AddLogs("Execute trades is disabled. ");
+                }
+            }
+        }
     }
 }
